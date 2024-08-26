@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:angular-todo-app": "node dist/angular-todo-app/server/server.mjs"
+    "serve:ssr:angular-todo-app": "node dist/angular-todo-app/server/server.mjs",
+    "deploy": "ng deploy angular-todo-app --base-href=/Angular-todo-app/ --repo=https://github.com/Denys209818/Angular-todo-app.git"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +22,8 @@
     "@angular/platform-server": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@angular/ssr": "^18.2.1",
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "bulma": "^1.0.2",
     "express": "^4.18.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
