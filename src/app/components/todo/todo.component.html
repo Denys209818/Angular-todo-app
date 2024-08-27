@@ -1,0 +1,40 @@
+<div data-cy="Todo" class="todo" [class.completed]="todo.completed">
+  <label class="todo__status-label">
+    <input
+      data-cy="TodoStatus"
+      type="checkbox"
+      class="todo__status"
+      [checked]="todo.completed"
+      (change)="toggle.emit()"
+    />
+  </label>
+
+  <form *ngIf="editing; else content" (ngSubmit)="save()">
+    <input
+      #inputField
+      data-cy="TodoTitleField"
+      type="text"
+      class="todo__title-field"
+      placeholder="Empty todo will be deleted"
+      [(ngModel)]="title"
+      name="title"
+      (keyup.escape)="editing = false"
+      (blur)="save()"
+    />
+  </form>
+
+  <ng-template #content>
+    <span data-cy="TodoTitle" class="todo__title" (dblclick)="edit()">
+      {{ todo.title }}
+    </span>
+
+    <button
+      type="button"
+      class="todo__remove"
+      data-cy="TodoDelete"
+      (click)="delete.emit()"
+    >
+      ×
+    </button>
+  </ng-template>
+</div>
