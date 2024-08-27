@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EnvironmentProviders, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 import { Todo } from './types/todo';
 import { TodoComponent } from "./components/todo/todo.component";
 import { ActiveItemsPipe } from "./pipes/active-items.pipe";
+import { TodoService } from './services/todo.service';
+import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { HttpModule } from './modules/http/http.module';
 
 const todos = [
   {id: 1, title: 'HTML + CSS', completed: true },
@@ -16,10 +19,18 @@ const todos = [
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule, TodoComponent, ActiveItemsPipe],
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TodoComponent,
+    ActiveItemsPipe,
+    HttpModule
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  providers: [TodoService]
 })
 export class AppComponent implements OnInit {
   editing = false;
@@ -52,9 +63,14 @@ export class AppComponent implements OnInit {
     return this._todos;
   }
 
-  constructor() {}
+  constructor(
+    private todoService: TodoService
+  ) {}
   ngOnInit(): void {
-    this.todos = todos;
+    this.todoService.getTodos()
+      .subscribe(todos => {
+        this.todos = todos;
+      })
   }
 
   handleFormSubmit() {
@@ -105,3 +121,11 @@ export class AppComponent implements OnInit {
     return todo.id;
   }
 }
+function importProvidersFrom(arg0: EnvironmentProviders): import("@angular/core").Provider {
+  throw new Error('Function not implemented.');
+}
+
+function withInterceptorsFromDi(): import("@angular/common/http").HttpFeature<import("@angular/common/http").HttpFeatureKind> {
+  throw new Error('Function not implemented.');
+}
+
