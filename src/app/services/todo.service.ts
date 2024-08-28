@@ -23,7 +23,7 @@ export class TodoService {
     this.client.get<Todo[]>(URL + '/todos?userId=751')
       .subscribe(values => {
         this.todos$$.next(values);
-      })
+      });
   }
 
   addTodo(todo: Todo) {

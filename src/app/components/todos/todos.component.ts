@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterModule, RouterOutlet } from '@angular/router';
 import { Todo } from '../../types/todo';
 import { TodoComponent } from '../todo/todo.component';
 import { ActiveItemsPipe } from '../../pipes/active-items.pipe';
 import { HttpModule } from '../../modules/http/http.module';
 import { TodoService } from '../../services/todo.service';
-
+import { BehaviorSubject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-todos',
@@ -19,7 +19,8 @@ import { TodoService } from '../../services/todo.service';
     ReactiveFormsModule,
     TodoComponent,
     ActiveItemsPipe,
-    HttpModule
+    HttpModule,
+    RouterModule
   ],
   templateUrl: './todos.component.html',
   styleUrl: './todos.component.scss',
@@ -29,6 +30,11 @@ export class TodosComponent implements OnInit {
   editing = false;
   _todos: Todo[] = [];
   activeTodos: Todo[] = [];
+  completedTodos: Todo[] = [];
+  usedTodos$$ = new BehaviorSubject<Todo[]>(this.allTodos);
+
+  status = 'all';
+
   todoForm = new FormGroup({
     title: new FormControl('', {
       nonNullable: true,
@@ -50,6 +56,7 @@ export class TodosComponent implements OnInit {
 
     this._todos = value;
     this.activeTodos = [...value.filter(x => !x.completed)];
+    this.completedTodos = [...value.filter(x => x.completed)];
   }
 
   get allTodos() {
@@ -57,14 +64,39 @@ export class TodosComponent implements OnInit {
   }
 
   constructor(
-    private todoService: TodoService
-  ) {}
+    private todoService: TodoService,
+    private route: ActivatedRoute
+  ) {
+  }
 
   ngOnInit(): void {
     this.todoService.todos$
       .subscribe(todos => {
         this.todos = todos;
+        this.usedTodos$$.next(this.getFormedTodos(todos));
       });
+
+    this.route.params.subscribe(params => {
+      this.status = params['status'];
+
+      switch (this.status) {
+        case 'active': {
+          this.usedTodos$$.next(this.activeTodos);
+
+          break;
+        }
+
+        case 'completed': {
+          this.usedTodos$$.next(this.completedTodos);
+
+          break;
+        }
+
+        default: {
+          this.usedTodos$$.next(this.allTodos);
+        }
+      }
+    })
 
     this.todoService.loadTodos();
   }
@@ -115,5 +147,21 @@ export class TodosComponent implements OnInit {
 
   getTrackById(i: number, todo: Todo) {
     return todo.id;
+  }
+
+  getFormedTodos(todos: Todo[]) {
+    switch (this.status) {
+      case 'active': {
+        return todos.filter(x => !x.completed);
+      }
+
+      case 'completed': {
+        return todos.filter(x => x.completed);
+      }
+
+      default: {
+        return todos;
+      }
+    }
   }
 }

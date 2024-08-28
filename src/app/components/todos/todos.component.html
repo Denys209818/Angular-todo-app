@@ -25,7 +25,7 @@
 
     <section class="todoapp__main" data-cy="TodoList">
       <app-todo
-        *ngFor="let todo of allTodos; let i = index; trackBy: getTrackById"
+        *ngFor="let todo of (usedTodos$$ | async); let i = index; trackBy: getTrackById"
         [todo]="todo"
         (delete)="deleteTodo(todo.id)"
         (rename)="renameTodo(todo.id, $event)"
@@ -40,7 +40,8 @@
 
       <nav class="filter" data-cy="Filter">
         <a
-          href="#/"
+          routerLink="/todos/all"
+          routerLinkActive="selected"
           class="filter__link selected"
           data-cy="FilterLinkAll"
         >
@@ -48,7 +49,8 @@
         </a>
 
         <a
-          href="#/active"
+          routerLink="/todos/active"
+          routerLinkActive="selected"
           class="filter__link"
           data-cy="FilterLinkActive"
         >
@@ -56,7 +58,8 @@
         </a>
 
         <a
-          href="#/completed"
+          routerLink="/todos/completed"
+          routerLinkActive="selected"
           class="filter__link"
           data-cy="FilterLinkCompleted"
         >
